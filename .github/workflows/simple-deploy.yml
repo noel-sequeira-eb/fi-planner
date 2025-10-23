@@ -1,13 +1,12 @@
-name: Build and Deploy
+name: Deploy to GitHub Pages
+
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
   build-and-deploy:
@@ -26,8 +25,10 @@ jobs:
         run: |
           npm ci
           npm run build
+        env:
+          NODE_ENV: production
 
-      - name: Deploy 🚀
+      - name: Deploy to gh-pages branch 🚀
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

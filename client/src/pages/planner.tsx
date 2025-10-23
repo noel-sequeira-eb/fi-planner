@@ -924,6 +924,59 @@ export default function PlannerPage() {
                         )}
                       </Card>
 
+                      {/* Scenario Analysis */}
+                      {results && results.s5 && results.s5.netInvestIncome < results.target5 && (
+                        <Card className="p-4 mb-6 border-orange-200 bg-orange-50/30">
+                          <h3 className="font-bold mb-3 text-orange-700">💡 Scenario Analysis: How to Eliminate Shortfall</h3>
+                          
+                          <div className="space-y-4">
+                            <div className="text-sm text-muted-foreground mb-3">
+                              You need <span className="font-bold text-orange-600">{fmt.format(results.target5 - results.s5.netInvestIncome)}</span> more annual income to reach your target.
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-sm">📈 Strategy 1: Increase Investment Borrowing</h4>
+                                <div className="text-xs text-muted-foreground space-y-1">
+                                  <div>Current credit available: <span className="font-bold text-green-600">{fmt.format(creditAvailable)}</span></div>
+                                  <div>Additional investment needed: <span className="font-bold">{fmt.format((results.target5 - results.s5.netInvestIncome) / (inputs.dividendYield / 100))}</span></div>
+                                  <div>• Use more of your HELOC for investments</div>
+                                  <div>• Generate {inputs.dividendYield}% dividend yield</div>
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-sm">🏠 Strategy 2: Add More Rental Properties</h4>
+                                <div className="text-xs text-muted-foreground space-y-1">
+                                  <div>Additional rental income needed: <span className="font-bold">{fmt.format(results.target5 - results.s5.netInvestIncome)}</span></div>
+                                  <div>• Add higher cap rate properties</div>
+                                  <div>• Purchase earlier in timeline</div>
+                                  <div>• Consider duplex/triplex properties</div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="border-t border-orange-200 pt-3 mt-4">
+                              <h4 className="font-semibold text-sm mb-2">🎯 Quick Fixes to Try:</h4>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                                <div className="p-2 bg-white rounded border">
+                                  <div className="font-medium">Increase Dividend Yield</div>
+                                  <div className="text-muted-foreground">Change from {inputs.dividendYield}% to 6%+</div>
+                                </div>
+                                <div className="p-2 bg-white rounded border">
+                                  <div className="font-medium">Extend Timeline</div>
+                                  <div className="text-muted-foreground">Target Year 7-10 instead of Year {inputs.retirementYear}</div>
+                                </div>
+                                <div className="p-2 bg-white rounded border">
+                                  <div className="font-medium">Add Property</div>
+                                  <div className="text-muted-foreground">Add one more 7%+ cap rate rental</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      )}
+
                       {/* Year 10 projection */}
                       <Card className="p-4 mb-6">
                         <h3 className="font-bold mb-3">Year-{Math.min(10, inputs.horizonYears)} Projection</h3>

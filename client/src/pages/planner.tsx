@@ -55,8 +55,10 @@ export default function PlannerPage() {
     mortgage2Balance: 174787.24, // Investment LOC already borrowed
     mortgage2Rate: 6.7, // Rate on existing investment LOC
     
-    // Payment Frequencies
+    // Payment Details
+    mortgage1PaymentAmount: 2100, // User-entered payment amount
     mortgage1PaymentFreq: "monthly" as const,
+    mortgage2PaymentAmount: 1200, // User-entered payment amount
     mortgage2PaymentFreq: "monthly" as const,
     
     dividendYield: 4.5,
@@ -90,20 +92,9 @@ export default function PlannerPage() {
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
-  // Calculate mortgage payments
-  const calculatePayment = (principal: number, rate: number, amortYears: number, frequency: string) => {
-    if (principal <= 0 || rate <= 0) return 0;
-    
-    const periodsPerYear = frequency === 'weekly' ? 52 : frequency === 'bi-weekly' ? 26 : 12;
-    const totalPeriods = amortYears * periodsPerYear;
-    const periodRate = (rate / 100) / periodsPerYear;
-    
-    return (principal * periodRate * Math.pow(1 + periodRate, totalPeriods)) / 
-           (Math.pow(1 + periodRate, totalPeriods) - 1);
-  };
-
-  const mortgage1Payment = calculatePayment(inputs.mortgageBalance, inputs.primaryRate, inputs.amortYears, inputs.mortgage1PaymentFreq);
-  const mortgage2Payment = calculatePayment(inputs.mortgage2Balance, inputs.mortgage2Rate, inputs.amortYears, inputs.mortgage2PaymentFreq);
+  // Use user-entered payment amounts
+  const mortgage1Payment = inputs.mortgage1PaymentAmount;
+  const mortgage2Payment = inputs.mortgage2PaymentAmount;
 
   // Calculate capacity - based on actual credit line
   const totalUsed = inputs.mortgageBalance + inputs.mortgage2Balance;
@@ -163,8 +154,10 @@ export default function PlannerPage() {
       mortgage2Balance: 174787.24, // Investment LOC already borrowed
       mortgage2Rate: 6.7, // Rate on existing investment LOC
       
-      // Payment Frequencies
+      // Payment Details
+      mortgage1PaymentAmount: 2100, // User-entered payment amount
       mortgage1PaymentFreq: "monthly" as const,
+      mortgage2PaymentAmount: 1200, // User-entered payment amount
       mortgage2PaymentFreq: "monthly" as const,
       
       dividendYield: 4.5,
@@ -490,7 +483,7 @@ export default function PlannerPage() {
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                           <Label htmlFor="primaryRate">Primary mortgage rate (%)</Label>
                           <Input
@@ -503,13 +496,13 @@ export default function PlannerPage() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="amortYears">Amortization (years)</Label>
+                          <Label htmlFor="mortgage1PaymentAmount">Payment amount ($)</Label>
                           <Input
-                            id="amortYears"
+                            id="mortgage1PaymentAmount"
                             type="number"
-                            value={inputs.amortYears}
-                            onChange={(e) => updateInput('amortYears', Number(e.target.value))}
-                            data-testid="input-amort-years"
+                            value={inputs.mortgage1PaymentAmount}
+                            onChange={(e) => updateInput('mortgage1PaymentAmount', Number(e.target.value))}
+                            data-testid="input-mortgage1-payment"
                           />
                         </div>
                         <div>
@@ -527,6 +520,16 @@ export default function PlannerPage() {
                               <SelectItem value="weekly">Weekly</SelectItem>
                             </SelectContent>
                           </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="amortYears">Amortization (years)</Label>
+                          <Input
+                            id="amortYears"
+                            type="number"
+                            value={inputs.amortYears}
+                            onChange={(e) => updateInput('amortYears', Number(e.target.value))}
+                            data-testid="input-amort-years"
+                          />
                         </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -656,6 +659,16 @@ export default function PlannerPage() {
                           />
                         </div>
                         <div>
+                          <Label htmlFor="mortgage2PaymentAmount">Payment amount ($)</Label>
+                          <Input
+                            id="mortgage2PaymentAmount"
+                            type="number"
+                            value={inputs.mortgage2PaymentAmount}
+                            onChange={(e) => updateInput('mortgage2PaymentAmount', Number(e.target.value))}
+                            data-testid="input-mortgage2-payment"
+                          />
+                        </div>
+                        <div>
                           <Label htmlFor="mortgage2PaymentFreq">Payment frequency</Label>
                           <Select
                             value={inputs.mortgage2PaymentFreq}
@@ -670,16 +683,6 @@ export default function PlannerPage() {
                               <SelectItem value="weekly">Weekly</SelectItem>
                             </SelectContent>
                           </Select>
-                        </div>
-                        <div className="flex flex-col justify-end">
-                          <div className="text-sm text-muted-foreground mb-1">Current payment</div>
-                          <div className="font-bold text-blue-600 tabular-nums">{fmt.format(mortgage2Payment)}</div>
-                          <div className="text-xs text-muted-foreground">
-                            <span className="capitalize font-medium">{inputs.mortgage2PaymentFreq}</span>
-                            {inputs.mortgage2PaymentFreq === 'bi-weekly' && ' (26/year)'}
-                            {inputs.mortgage2PaymentFreq === 'weekly' && ' (52/year)'}
-                            {inputs.mortgage2PaymentFreq === 'monthly' && ' (12/year)'}
-                          </div>
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2">

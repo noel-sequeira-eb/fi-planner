@@ -28,6 +28,10 @@ export const inputsSchema = z.object({
   mortgage2Balance: z.number().min(0), // Investment LOC already borrowed
   mortgage2Rate: z.number().min(0).max(100), // Rate on existing investment LOC
   
+  // Mortgage Payment Details
+  mortgage1PaymentFreq: z.enum(["monthly", "bi-weekly", "weekly"]),
+  mortgage2PaymentFreq: z.enum(["monthly", "bi-weekly", "weekly"]),
+  
   // Portfolio
   dividendYield: z.number().min(0).max(100),
   totalReturn: z.number().min(0).max(100),

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Moon, Sun, Download, FileDown, Plus, X } from "lucide-react";
 import type { Property, PlanInputs, SimulationResults } from "@shared/schema";
@@ -54,6 +55,10 @@ export default function PlannerPage() {
     mortgage2Balance: 174787.24, // Investment LOC already borrowed
     mortgage2Rate: 6.7, // Rate on existing investment LOC
     
+    // Payment Frequencies
+    mortgage1PaymentFreq: "monthly" as const,
+    mortgage2PaymentFreq: "monthly" as const,
+    
     dividendYield: 4.5,
     totalReturn: 6.0,
     inflation: 2.5,
@@ -84,6 +89,21 @@ export default function PlannerPage() {
   }, [theme]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+  // Calculate mortgage payments
+  const calculatePayment = (principal: number, rate: number, amortYears: number, frequency: string) => {
+    if (principal <= 0 || rate <= 0) return 0;
+    
+    const periodsPerYear = frequency === 'weekly' ? 52 : frequency === 'bi-weekly' ? 26 : 12;
+    const totalPeriods = amortYears * periodsPerYear;
+    const periodRate = (rate / 100) / periodsPerYear;
+    
+    return (principal * periodRate * Math.pow(1 + periodRate, totalPeriods)) / 
+           (Math.pow(1 + periodRate, totalPeriods) - 1);
+  };
+
+  const mortgage1Payment = calculatePayment(inputs.mortgageBalance, inputs.primaryRate, inputs.amortYears, inputs.mortgage1PaymentFreq);
+  const mortgage2Payment = calculatePayment(inputs.mortgage2Balance, inputs.mortgage2Rate, inputs.amortYears, inputs.mortgage2PaymentFreq);
 
   // Calculate capacity - based on actual credit line
   const totalUsed = inputs.mortgageBalance + inputs.mortgage2Balance;
@@ -142,6 +162,10 @@ export default function PlannerPage() {
       totalCreditLine: 620000, // Total HELOC credit available
       mortgage2Balance: 174787.24, // Investment LOC already borrowed
       mortgage2Rate: 6.7, // Rate on existing investment LOC
+      
+      // Payment Frequencies
+      mortgage1PaymentFreq: "monthly" as const,
+      mortgage2PaymentFreq: "monthly" as const,
       
       dividendYield: 4.5,
       totalReturn: 6.0,
@@ -345,8 +369,8 @@ export default function PlannerPage() {
               </div>
               
               <Card className="p-6">
-                <h3 className="font-bold mb-4" data-testid="heading-capacity">Credit Line Snapshot</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <h3 className="font-bold mb-4" data-testid="heading-capacity">Credit Line & Payments</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm mb-4">
                   <div>
                     <div className="text-muted-foreground mb-1">Total Credit Line</div>
                     <div className="font-bold tabular-nums" data-testid="value-total-credit">{fmt.format(inputs.totalCreditLine)}</div>
@@ -354,14 +378,6 @@ export default function PlannerPage() {
                   <div>
                     <div className="text-muted-foreground mb-1">Credit Available Now</div>
                     <div className="font-bold tabular-nums text-green-600" data-testid="value-credit-available">{fmt.format(creditAvailable)}</div>
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground mb-1">Mortgage 1 (Primary)</div>
-                    <div className="font-bold tabular-nums" data-testid="value-mortgage1">{fmt.format(inputs.mortgageBalance)}</div>
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground mb-1">Mortgage 2 (Investment LOC)</div>
-                    <div className="font-bold tabular-nums" data-testid="value-mortgage2">{fmt.format(inputs.mortgage2Balance)}</div>
                   </div>
                   <div>
                     <div className="text-muted-foreground mb-1">Total Used</div>
@@ -372,8 +388,29 @@ export default function PlannerPage() {
                     <div className="font-bold tabular-nums" data-testid="value-utilization">{((totalUsed / inputs.totalCreditLine) * 100).toFixed(1)}%</div>
                   </div>
                 </div>
+                
+                <div className="border-t border-border pt-4">
+                  <h4 className="font-semibold mb-3">Mortgage Details</h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-2">
+                      <div className="text-muted-foreground font-medium">Mortgage 1 (Primary)</div>
+                      <div>Balance: <span className="font-bold tabular-nums">{fmt.format(inputs.mortgageBalance)}</span></div>
+                      <div>Rate: <span className="font-bold">{inputs.primaryRate}%</span></div>
+                      <div>Payment: <span className="font-bold tabular-nums text-red-600">{fmt.format(mortgage1Payment)}</span></div>
+                      <div className="text-xs text-muted-foreground capitalize">{inputs.mortgage1PaymentFreq}</div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-muted-foreground font-medium">Mortgage 2 (Investment)</div>
+                      <div>Balance: <span className="font-bold tabular-nums">{fmt.format(inputs.mortgage2Balance)}</span></div>
+                      <div>Rate: <span className="font-bold text-blue-600">{inputs.mortgage2Rate}%</span></div>
+                      <div>Payment: <span className="font-bold tabular-nums text-blue-600">{fmt.format(mortgage2Payment)}</span></div>
+                      <div className="text-xs text-muted-foreground capitalize">{inputs.mortgage2PaymentFreq}</div>
+                    </div>
+                  </div>
+                </div>
+                
                 <p className="text-xs text-muted-foreground mt-4">
-                  Shows your actual HELOC situation. Additional borrowing capacity available for investments.
+                  Primary mortgage (red) is non-deductible. Investment mortgage (blue) interest is tax-deductible.
                 </p>
               </Card>
             </div>
@@ -414,7 +451,7 @@ export default function PlannerPage() {
                         />
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="totalCreditLine">Total HELOC Credit Line ($)</Label>
                           <Input
@@ -435,19 +472,8 @@ export default function PlannerPage() {
                             data-testid="input-mortgage2-balance"
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="mortgage2Rate">Investment LOC rate (%)</Label>
-                          <Input
-                            id="mortgage2Rate"
-                            type="number"
-                            step="0.01"
-                            value={inputs.mortgage2Rate}
-                            onChange={(e) => updateInput('mortgage2Rate', Number(e.target.value))}
-                            data-testid="input-mortgage2-rate"
-                          />
-                        </div>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <Label htmlFor="primaryRate">Primary mortgage rate (%)</Label>
                           <Input
@@ -468,6 +494,22 @@ export default function PlannerPage() {
                             onChange={(e) => updateInput('amortYears', Number(e.target.value))}
                             data-testid="input-amort-years"
                           />
+                        </div>
+                        <div>
+                          <Label htmlFor="mortgage1PaymentFreq">Payment frequency</Label>
+                          <Select
+                            value={inputs.mortgage1PaymentFreq}
+                            onValueChange={(value: any) => updateInput('mortgage1PaymentFreq', value)}
+                          >
+                            <SelectTrigger data-testid="select-mortgage1-freq">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -545,8 +587,8 @@ export default function PlannerPage() {
 
                   {/* Portfolio */}
                   <div className="border border-dashed border-border rounded-lg p-4 mb-6">
-                    <h3 className="font-semibold mb-4">Portfolio</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <h3 className="font-semibold mb-4">Portfolio & Investment Financing</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                       <div>
                         <Label htmlFor="dividendYield">Dividend yield (%)</Label>
                         <Input
@@ -580,6 +622,47 @@ export default function PlannerPage() {
                           data-testid="input-inflation"
                         />
                       </div>
+                    </div>
+                    
+                    <div className="border-t border-border pt-4">
+                      <h4 className="font-medium mb-3 text-blue-600">Investment Mortgage (Tax-Deductible)</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="mortgage2Rate">Investment LOC rate (%)</Label>
+                          <Input
+                            id="mortgage2Rate"
+                            type="number"
+                            step="0.01"
+                            value={inputs.mortgage2Rate}
+                            onChange={(e) => updateInput('mortgage2Rate', Number(e.target.value))}
+                            data-testid="input-mortgage2-rate"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="mortgage2PaymentFreq">Payment frequency</Label>
+                          <Select
+                            value={inputs.mortgage2PaymentFreq}
+                            onValueChange={(value: any) => updateInput('mortgage2PaymentFreq', value)}
+                          >
+                            <SelectTrigger data-testid="select-mortgage2-freq">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="bi-weekly">Bi-weekly</SelectItem>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex flex-col justify-end">
+                          <div className="text-sm text-muted-foreground mb-1">Current payment</div>
+                          <div className="font-bold text-blue-600 tabular-nums">{fmt.format(mortgage2Payment)}</div>
+                          <div className="text-xs text-muted-foreground capitalize">{inputs.mortgage2PaymentFreq}</div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Investment mortgage interest is tax-deductible, reducing after-tax borrowing cost.
+                      </p>
                     </div>
                   </div>
 

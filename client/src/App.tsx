@@ -10,6 +10,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={PlannerPage} />
+      <Route path="/fi-planner/" component={PlannerPage} />
       <Route component={NotFound} />
     </Switch>
   );

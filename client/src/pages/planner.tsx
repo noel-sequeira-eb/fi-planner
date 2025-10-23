@@ -950,10 +950,11 @@ export default function PlannerPage() {
                                     <div>• Uses <span className="font-bold">{fmt.format(Math.min((results.target5 - results.s5.netInvestIncome) / 0.065, creditAvailable))}</span> of available credit</div>
                                   </div>
                                   <div className="border-t border-blue-200 pt-2">
-                                    <div className="font-medium mb-1">Scenario B: Maximum HELOC Usage</div>
-                                    <div>• Use all <span className="font-bold">{fmt.format(creditAvailable)}</span> available credit</div>
-                                    <div>• At {inputs.dividendYield}% yield: <span className="font-bold">{fmt.format(creditAvailable * (inputs.dividendYield / 100))}</span> annual income</div>
-                                    <div>• Reduces shortfall to: <span className="font-bold text-orange-600">{fmt.format(Math.max(0, results.target5 - results.s5.netInvestIncome - creditAvailable * (inputs.dividendYield / 100)))}</span></div>
+                                    <div className="font-medium mb-1">Scenario B: Smith Manoeuvre Acceleration</div>
+                                    <div>• Current available credit: <span className="font-bold">{fmt.format(creditAvailable)}</span></div>
+                                    <div>• Plus mortgage paydown creates more capacity each year</div>
+                                    <div>• Immediate investment: <span className="font-bold">{fmt.format(creditAvailable * (inputs.dividendYield / 100))}</span> annual income</div>
+                                    <div>• <span className="text-green-600">Grows automatically</span> as mortgage principal is reborrowed</div>
                                   </div>
                                 </div>
                               </div>
@@ -983,13 +984,14 @@ export default function PlannerPage() {
 
                               {/* Combined Strategy */}
                               <div className="bg-purple-50 p-3 rounded border border-purple-200">
-                                <h4 className="font-semibold text-sm mb-2">🎯 Strategy 3: Hybrid Approach</h4>
+                                <h4 className="font-semibold text-sm mb-2">🎯 Strategy 3: Smith Manoeuvre + Rentals</h4>
                                 <div className="space-y-2 text-xs">
-                                  <div className="font-medium mb-1">Balanced Portfolio Expansion</div>
-                                  <div>• Use <span className="font-bold">{fmt.format(creditAvailable * 0.6)}</span> credit for 6% dividend stocks</div>
+                                  <div className="font-medium mb-1">Compound Growth Strategy</div>
+                                  <div>• Use <span className="font-bold">{fmt.format(creditAvailable * 0.6)}</span> for dividend stocks (immediate)</div>
                                   <div>• Add one 7.5% cap rate rental property</div>
-                                  <div>• Combined additional income: <span className="font-bold text-green-600">{fmt.format(creditAvailable * 0.6 * 0.06 + (results.target5 - results.s5.netInvestIncome - creditAvailable * 0.6 * 0.06) / 0.075 * 0.075)}</span></div>
-                                  <div>• Risk diversification across asset classes</div>
+                                  <div>• <span className="text-purple-600 font-medium">Smith Manoeuvre advantage:</span> Every mortgage payment creates new investment capacity</div>
+                                  <div>• Year 1 income: <span className="font-bold text-green-600">{fmt.format(creditAvailable * 0.6 * 0.06)}</span> + rental income</div>
+                                  <div>• <span className="text-green-600">Grows exponentially</span> as principal payments are reborrowed for more investments</div>
                                 </div>
                               </div>
                             </div>

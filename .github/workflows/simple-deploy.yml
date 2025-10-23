@@ -21,10 +21,11 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install and Build 🔧
-        run: |
-          npm ci
-          npm run build
+      - name: Install dependencies �
+        run: npm install
+
+      - name: Build 🔧
+        run: npm run build:client
         env:
           NODE_ENV: production
 

@@ -39,7 +39,7 @@ export default function PlannerPage() {
   // Inputs state
   const [inputs, setInputs] = useState<PlanInputs>({
     homeValue: 1200000,
-    mortgageBalance: 330000,
+    mortgageBalance: 320836.56, // Mortgage 1 balance
     primaryRate: 5.5,
     amortYears: 25,
     extraPrepay: 2000,
@@ -48,6 +48,12 @@ export default function PlannerPage() {
     maxHelocLtv: 65,
     taxRate: 40,
     capitalizeInterest: true,
+    
+    // Credit Line Details
+    totalCreditLine: 620000, // Total HELOC credit available
+    mortgage2Balance: 174787.24, // Investment LOC already borrowed
+    mortgage2Rate: 6.7, // Rate on existing investment LOC
+    
     dividendYield: 4.5,
     totalReturn: 6.0,
     inflation: 2.5,
@@ -79,7 +85,9 @@ export default function PlannerPage() {
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
-  // Calculate capacity
+  // Calculate capacity - based on actual credit line
+  const totalUsed = inputs.mortgageBalance + inputs.mortgage2Balance;
+  const creditAvailable = Math.max(0, inputs.totalCreditLine - totalUsed);
   const maxCltv = inputs.homeValue * (inputs.maxLtv / 100);
   const helocCap = inputs.homeValue * (inputs.maxHelocLtv / 100);
   const helocRoom = Math.max(0, maxCltv - inputs.mortgageBalance);
@@ -120,7 +128,7 @@ export default function PlannerPage() {
   const resetInputs = () => {
     setInputs({
       homeValue: 1200000,
-      mortgageBalance: 330000,
+      mortgageBalance: 320836.56, // Mortgage 1 balance
       primaryRate: 5.5,
       amortYears: 25,
       extraPrepay: 2000,
@@ -129,6 +137,12 @@ export default function PlannerPage() {
       maxHelocLtv: 65,
       taxRate: 40,
       capitalizeInterest: true,
+      
+      // Credit Line Details
+      totalCreditLine: 620000, // Total HELOC credit available
+      mortgage2Balance: 174787.24, // Investment LOC already borrowed
+      mortgage2Rate: 6.7, // Rate on existing investment LOC
+      
       dividendYield: 4.5,
       totalReturn: 6.0,
       inflation: 2.5,
@@ -331,27 +345,35 @@ export default function PlannerPage() {
               </div>
               
               <Card className="p-6">
-                <h3 className="font-bold mb-4" data-testid="heading-capacity">Capacity Snapshot</h3>
+                <h3 className="font-bold mb-4" data-testid="heading-capacity">Credit Line Snapshot</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-muted-foreground mb-1">Max CLTV @ {inputs.maxLtv}%</div>
-                    <div className="font-bold tabular-nums" data-testid="value-max-cltv">{fmt.format(maxCltv)}</div>
+                    <div className="text-muted-foreground mb-1">Total Credit Line</div>
+                    <div className="font-bold tabular-nums" data-testid="value-total-credit">{fmt.format(inputs.totalCreditLine)}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground mb-1">HELOC room today</div>
-                    <div className="font-bold tabular-nums" data-testid="value-heloc-room">{fmt.format(helocRoom)}</div>
+                    <div className="text-muted-foreground mb-1">Credit Available Now</div>
+                    <div className="font-bold tabular-nums text-green-600" data-testid="value-credit-available">{fmt.format(creditAvailable)}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground mb-1">HELOC cap @ {inputs.maxHelocLtv}% LTV</div>
-                    <div className="font-bold tabular-nums" data-testid="value-heloc-cap">{fmt.format(helocCap)}</div>
+                    <div className="text-muted-foreground mb-1">Mortgage 1 (Primary)</div>
+                    <div className="font-bold tabular-nums" data-testid="value-mortgage1">{fmt.format(inputs.mortgageBalance)}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground mb-1">Existing Mortgage</div>
-                    <div className="font-bold tabular-nums" data-testid="value-existing-mortgage">{fmt.format(inputs.mortgageBalance)}</div>
+                    <div className="text-muted-foreground mb-1">Mortgage 2 (Investment LOC)</div>
+                    <div className="font-bold tabular-nums" data-testid="value-mortgage2">{fmt.format(inputs.mortgage2Balance)}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground mb-1">Total Used</div>
+                    <div className="font-bold tabular-nums" data-testid="value-total-used">{fmt.format(totalUsed)}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground mb-1">Utilization</div>
+                    <div className="font-bold tabular-nums" data-testid="value-utilization">{((totalUsed / inputs.totalCreditLine) * 100).toFixed(1)}%</div>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-4">
-                  Assumes Canadian CLP: HELOC ≤ 65% LTV; combined mortgage+HELOC ≤ 80% LTV.
+                  Shows your actual HELOC situation. Additional borrowing capacity available for investments.
                 </p>
               </Card>
             </div>
@@ -382,7 +404,7 @@ export default function PlannerPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="mortgageBalance">Current mortgage balance ($)</Label>
+                        <Label htmlFor="mortgageBalance">Mortgage 1 balance (Primary) ($)</Label>
                         <Input
                           id="mortgageBalance"
                           type="number"
@@ -390,6 +412,40 @@ export default function PlannerPage() {
                           onChange={(e) => updateInput('mortgageBalance', Number(e.target.value))}
                           data-testid="input-mortgage-balance"
                         />
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="totalCreditLine">Total HELOC Credit Line ($)</Label>
+                          <Input
+                            id="totalCreditLine"
+                            type="number"
+                            value={inputs.totalCreditLine}
+                            onChange={(e) => updateInput('totalCreditLine', Number(e.target.value))}
+                            data-testid="input-total-credit-line"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="mortgage2Balance">Mortgage 2 balance (Investment LOC) ($)</Label>
+                          <Input
+                            id="mortgage2Balance"
+                            type="number"
+                            value={inputs.mortgage2Balance}
+                            onChange={(e) => updateInput('mortgage2Balance', Number(e.target.value))}
+                            data-testid="input-mortgage2-balance"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="mortgage2Rate">Investment LOC rate (%)</Label>
+                          <Input
+                            id="mortgage2Rate"
+                            type="number"
+                            step="0.01"
+                            value={inputs.mortgage2Rate}
+                            onChange={(e) => updateInput('mortgage2Rate', Number(e.target.value))}
+                            data-testid="input-mortgage2-rate"
+                          />
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>

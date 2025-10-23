@@ -23,6 +23,11 @@ export const inputsSchema = z.object({
   taxRate: z.number().min(0).max(100),
   capitalizeInterest: z.boolean(),
   
+  // Credit Line Details
+  totalCreditLine: z.number().min(0), // Total HELOC credit available (e.g., 620k)
+  mortgage2Balance: z.number().min(0), // Investment LOC already borrowed
+  mortgage2Rate: z.number().min(0).max(100), // Rate on existing investment LOC
+  
   // Portfolio
   dividendYield: z.number().min(0).max(100),
   totalReturn: z.number().min(0).max(100),

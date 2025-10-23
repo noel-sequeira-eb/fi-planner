@@ -390,22 +390,39 @@ export default function PlannerPage() {
                 </div>
                 
                 <div className="border-t border-border pt-4">
-                  <h4 className="font-semibold mb-3">Mortgage Details</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="space-y-2">
-                      <div className="text-muted-foreground font-medium">Mortgage 1 (Primary)</div>
-                      <div>Balance: <span className="font-bold tabular-nums">{fmt.format(inputs.mortgageBalance)}</span></div>
-                      <div>Rate: <span className="font-bold">{inputs.primaryRate}%</span></div>
-                      <div>Payment: <span className="font-bold tabular-nums text-red-600">{fmt.format(mortgage1Payment)}</span></div>
-                      <div className="text-xs text-muted-foreground capitalize">{inputs.mortgage1PaymentFreq}</div>
+                  <h4 className="font-semibold mb-3">Mortgage Payment Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div className="space-y-3 p-3 border border-red-200 rounded-lg bg-red-50/30">
+                      <div className="text-red-700 font-semibold">Mortgage 1 (Primary)</div>
+                      <div className="space-y-1">
+                        <div>Balance: <span className="font-bold tabular-nums">{fmt.format(inputs.mortgageBalance)}</span></div>
+                        <div>Rate: <span className="font-bold">{inputs.primaryRate}%</span></div>
+                        <div>Payment: <span className="font-bold tabular-nums text-red-600">{fmt.format(mortgage1Payment)}</span></div>
+                        <div className="text-xs text-muted-foreground">
+                          <span className="capitalize font-medium">{inputs.mortgage1PaymentFreq}</span> payments
+                          {inputs.mortgage1PaymentFreq === 'bi-weekly' && ' (26/year)'}
+                          {inputs.mortgage1PaymentFreq === 'weekly' && ' (52/year)'}
+                          {inputs.mortgage1PaymentFreq === 'monthly' && ' (12/year)'}
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <div className="text-muted-foreground font-medium">Mortgage 2 (Investment)</div>
-                      <div>Balance: <span className="font-bold tabular-nums">{fmt.format(inputs.mortgage2Balance)}</span></div>
-                      <div>Rate: <span className="font-bold text-blue-600">{inputs.mortgage2Rate}%</span></div>
-                      <div>Payment: <span className="font-bold tabular-nums text-blue-600">{fmt.format(mortgage2Payment)}</span></div>
-                      <div className="text-xs text-muted-foreground capitalize">{inputs.mortgage2PaymentFreq}</div>
+                    <div className="space-y-3 p-3 border border-blue-200 rounded-lg bg-blue-50/30">
+                      <div className="text-blue-700 font-semibold">Mortgage 2 (Investment)</div>
+                      <div className="space-y-1">
+                        <div>Balance: <span className="font-bold tabular-nums">{fmt.format(inputs.mortgage2Balance)}</span></div>
+                        <div>Rate: <span className="font-bold text-blue-600">{inputs.mortgage2Rate}%</span></div>
+                        <div>Payment: <span className="font-bold tabular-nums text-blue-600">{fmt.format(mortgage2Payment)}</span></div>
+                        <div className="text-xs text-muted-foreground">
+                          <span className="capitalize font-medium">{inputs.mortgage2PaymentFreq}</span> payments
+                          {inputs.mortgage2PaymentFreq === 'bi-weekly' && ' (26/year)'}
+                          {inputs.mortgage2PaymentFreq === 'weekly' && ' (52/year)'}
+                          {inputs.mortgage2PaymentFreq === 'monthly' && ' (12/year)'}
+                        </div>
+                      </div>
                     </div>
+                  </div>
+                  <div className="mt-3 text-xs text-center text-muted-foreground">
+                    Total payments: <span className="font-bold">{fmt.format(mortgage1Payment + mortgage2Payment)}</span> per payment period
                   </div>
                 </div>
                 
@@ -657,7 +674,12 @@ export default function PlannerPage() {
                         <div className="flex flex-col justify-end">
                           <div className="text-sm text-muted-foreground mb-1">Current payment</div>
                           <div className="font-bold text-blue-600 tabular-nums">{fmt.format(mortgage2Payment)}</div>
-                          <div className="text-xs text-muted-foreground capitalize">{inputs.mortgage2PaymentFreq}</div>
+                          <div className="text-xs text-muted-foreground">
+                            <span className="capitalize font-medium">{inputs.mortgage2PaymentFreq}</span>
+                            {inputs.mortgage2PaymentFreq === 'bi-weekly' && ' (26/year)'}
+                            {inputs.mortgage2PaymentFreq === 'weekly' && ' (52/year)'}
+                            {inputs.mortgage2PaymentFreq === 'monthly' && ' (12/year)'}
+                          </div>
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2">

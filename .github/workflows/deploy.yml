@@ -2,9 +2,8 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main, fi-planner ]
-  pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -33,6 +32,8 @@ jobs:
         
       - name: Build
         run: npm run build
+        env:
+          NODE_ENV: production
         
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -934,42 +934,62 @@ export default function PlannerPage() {
                               You need <span className="font-bold text-orange-600">{fmt.format(results.target5 - results.s5.netInvestIncome)}</span> more annual income to reach your target.
                             </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-sm">📈 Strategy 1: Increase Investment Borrowing</h4>
-                                <div className="text-xs text-muted-foreground space-y-1">
-                                  <div>Current credit available: <span className="font-bold text-green-600">{fmt.format(creditAvailable)}</span></div>
-                                  <div>Additional investment needed: <span className="font-bold">{fmt.format((results.target5 - results.s5.netInvestIncome) / (inputs.dividendYield / 100))}</span></div>
-                                  <div>• Use more of your HELOC for investments</div>
-                                  <div>• Generate {inputs.dividendYield}% dividend yield</div>
+                            <div className="space-y-4">
+                              {/* Strategy 1: Investment Scenarios */}
+                              <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                                <h4 className="font-semibold text-sm mb-2">📈 Strategy 1: Optimize Investment Borrowing</h4>
+                                <div className="space-y-2 text-xs">
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div>Current credit available:</div>
+                                    <div className="font-bold text-green-600">{fmt.format(creditAvailable)}</div>
+                                  </div>
+                                  <div className="border-t border-blue-200 pt-2">
+                                    <div className="font-medium mb-1">Scenario A: Higher Dividend Yield</div>
+                                    <div>• Change from {inputs.dividendYield}% to <span className="font-bold">6.5%</span></div>
+                                    <div>• Additional investment needed: <span className="font-bold">{fmt.format((results.target5 - results.s5.netInvestIncome) / 0.065)}</span></div>
+                                    <div>• Uses <span className="font-bold">{fmt.format(Math.min((results.target5 - results.s5.netInvestIncome) / 0.065, creditAvailable))}</span> of available credit</div>
+                                  </div>
+                                  <div className="border-t border-blue-200 pt-2">
+                                    <div className="font-medium mb-1">Scenario B: Maximum HELOC Usage</div>
+                                    <div>• Use all <span className="font-bold">{fmt.format(creditAvailable)}</span> available credit</div>
+                                    <div>• At {inputs.dividendYield}% yield: <span className="font-bold">{fmt.format(creditAvailable * (inputs.dividendYield / 100))}</span> annual income</div>
+                                    <div>• Reduces shortfall to: <span className="font-bold text-orange-600">{fmt.format(Math.max(0, results.target5 - results.s5.netInvestIncome - creditAvailable * (inputs.dividendYield / 100)))}</span></div>
+                                  </div>
                                 </div>
                               </div>
-                              
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-sm">🏠 Strategy 2: Add More Rental Properties</h4>
-                                <div className="text-xs text-muted-foreground space-y-1">
-                                  <div>Additional rental income needed: <span className="font-bold">{fmt.format(results.target5 - results.s5.netInvestIncome)}</span></div>
-                                  <div>• Add higher cap rate properties</div>
-                                  <div>• Purchase earlier in timeline</div>
-                                  <div>• Consider duplex/triplex properties</div>
+
+                              {/* Strategy 2: Rental Property Scenarios */}
+                              <div className="bg-green-50 p-3 rounded border border-green-200">
+                                <h4 className="font-semibold text-sm mb-2">🏠 Strategy 2: Add Strategic Rental Properties</h4>
+                                <div className="space-y-2 text-xs">
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div>Additional income needed:</div>
+                                    <div className="font-bold text-orange-600">{fmt.format(results.target5 - results.s5.netInvestIncome)}</div>
+                                  </div>
+                                  <div className="border-t border-green-200 pt-2">
+                                    <div className="font-medium mb-1">Scenario A: High Cap Rate Properties</div>
+                                    <div>• Target 8% cap rate properties</div>
+                                    <div>• Investment needed: <span className="font-bold">{fmt.format((results.target5 - results.s5.netInvestIncome) / 0.08)}</span></div>
+                                    <div>• Could be 2-3 properties at $600k-$800k each</div>
+                                  </div>
+                                  <div className="border-t border-green-200 pt-2">
+                                    <div className="font-medium mb-1">Scenario B: Multi-Unit Properties</div>
+                                    <div>• Duplex/Triplex with 7%+ cap rates</div>
+                                    <div>• Better economies of scale</div>
+                                    <div>• 1-2 multi-unit properties could close the gap</div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            
-                            <div className="border-t border-orange-200 pt-3 mt-4">
-                              <h4 className="font-semibold text-sm mb-2">🎯 Quick Fixes to Try:</h4>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
-                                <div className="p-2 bg-white rounded border">
-                                  <div className="font-medium">Increase Dividend Yield</div>
-                                  <div className="text-muted-foreground">Change from {inputs.dividendYield}% to 6%+</div>
-                                </div>
-                                <div className="p-2 bg-white rounded border">
-                                  <div className="font-medium">Extend Timeline</div>
-                                  <div className="text-muted-foreground">Target Year 7-10 instead of Year {inputs.retirementYear}</div>
-                                </div>
-                                <div className="p-2 bg-white rounded border">
-                                  <div className="font-medium">Add Property</div>
-                                  <div className="text-muted-foreground">Add one more 7%+ cap rate rental</div>
+
+                              {/* Combined Strategy */}
+                              <div className="bg-purple-50 p-3 rounded border border-purple-200">
+                                <h4 className="font-semibold text-sm mb-2">🎯 Strategy 3: Hybrid Approach</h4>
+                                <div className="space-y-2 text-xs">
+                                  <div className="font-medium mb-1">Balanced Portfolio Expansion</div>
+                                  <div>• Use <span className="font-bold">{fmt.format(creditAvailable * 0.6)}</span> credit for 6% dividend stocks</div>
+                                  <div>• Add one 7.5% cap rate rental property</div>
+                                  <div>• Combined additional income: <span className="font-bold text-green-600">{fmt.format(creditAvailable * 0.6 * 0.06 + (results.target5 - results.s5.netInvestIncome - creditAvailable * 0.6 * 0.06) / 0.075 * 0.075)}</span></div>
+                                  <div>• Risk diversification across asset classes</div>
                                 </div>
                               </div>
                             </div>

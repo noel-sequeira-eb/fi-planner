@@ -76,9 +76,9 @@
   --chart-4: 38 92% 50%;
   --chart-5: 16 88% 54%;
 
-  --font-sans: Open Sans, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
+  --font-mono: 'SF Mono', 'Roboto Mono', Menlo, monospace;
   --radius: .5rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(220 8% 12% / 0.00);
   --shadow-xs: 0px 2px 0px 0px hsl(220 8% 12% / 0.00);
@@ -132,55 +132,55 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 220 5% 8%;
+  --background: 221 58% 6%;
 
-  --foreground: 220 8% 92%;
+  --foreground: 221 15% 92%;
 
-  --border: 220 6% 18%;
+  --border: 221 20% 12%;
 
-  --card: 220 5% 11%;
+  --card: 221 48% 11%;
 
-  --card-foreground: 220 8% 92%;
+  --card-foreground: 221 15% 92%;
 
-  --card-border: 220 6% 15%;
+  --card-border: 221 30% 14%;
 
-  --sidebar: 220 5% 13%;
+  --sidebar: 221 48% 10%;
 
-  --sidebar-foreground: 220 8% 92%;
+  --sidebar-foreground: 221 15% 92%;
 
-  --sidebar-border: 220 6% 20%;
+  --sidebar-border: 221 25% 15%;
 
-  --sidebar-primary: 214 95% 48%;
+  --sidebar-primary: 221 100% 68%;
 
-  --sidebar-primary-foreground: 214 20% 98%;
+  --sidebar-primary-foreground: 221 20% 98%;
 
-  --sidebar-accent: 220 8% 18%;
+  --sidebar-accent: 221 30% 14%;
 
-  --sidebar-accent-foreground: 220 8% 88%;
+  --sidebar-accent-foreground: 221 15% 88%;
 
-  --sidebar-ring: 214 95% 58%;
+  --sidebar-ring: 221 100% 68%;
 
-  --popover: 220 6% 15%;
+  --popover: 221 48% 11%;
 
-  --popover-foreground: 220 8% 92%;
+  --popover-foreground: 221 15% 92%;
 
-  --popover-border: 220 7% 22%;
+  --popover-border: 221 30% 18%;
 
-  --primary: 214 95% 48%;
+  --primary: 221 100% 68%;
 
-  --primary-foreground: 214 20% 98%;
+  --primary-foreground: 221 20% 98%;
 
-  --secondary: 220 8% 18%;
+  --secondary: 221 30% 14%;
 
-  --secondary-foreground: 220 8% 88%;
+  --secondary-foreground: 221 15% 88%;
 
-  --muted: 220 10% 16%;
+  --muted: 221 25% 16%;
 
-  --muted-foreground: 220 8% 72%;
+  --muted-foreground: 221 20% 65%;
 
-  --accent: 220 12% 20%;
+  --accent: 221 30% 18%;
 
-  --accent-foreground: 220 8% 88%;
+  --accent-foreground: 221 15% 88%;
 
   --destructive: 0 84% 42%;
 
@@ -238,7 +238,15 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background: 
+      radial-gradient(1200px 600px at 20% -20%, rgba(91, 140, 255, 0.25), transparent),
+      radial-gradient(1200px 600px at 130% 20%, rgba(76, 66, 225, 0.25), transparent),
+      hsl(var(--background));
+  }
+  
+  body.light {
+    background: hsl(var(--background));
   }
 }
 

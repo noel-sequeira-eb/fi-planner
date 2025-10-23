@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FI Planner – Smith Manoeuvre + Rentals</title>
+  <meta name="description" content="Plan a Smith Manoeuvre strategy and rental acquisitions to replace salary income.">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24'%3E%3Cpath fill='%23005cff' d='M12 2a10 10 0 1 0 10 10A10.012 10.012 0 0 0 12 2m1 14h-2v-2h2zm0-4h-2V6h2z'/%3E%3C/svg%3E">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm1 14h-2v-2h2Zm0-4h-2V6h2Z"/></svg>
+        <span>FI Planner</span>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggle" class="btn btn-ghost" title="Toggle theme">🌓</button>
+        <a class="btn btn-primary" id="exportCsv">Export CSV</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <h1>Smith Manoeuvre + Rentals</h1>
+          <p>Model a readvanceable mortgage strategy, investment LOC, and rental acquisitions to replace your salary. See balances, cashflows, and whether you’ll hit your Year‑5 target.</p>
+          <div class="badges">
+            <span class="badge">Client‑side • No sign‑in</span>
+            <span class="badge">Exportable CSV</span>
+            <span class="badge">Educational only</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="card">
+            <div class="card-title">Capacity Snapshot</div>
+            <div class="card-grid two">
+              <div>
+                <div class="label">Max CLTV @ 80%</div>
+                <div class="value" id="maxCltv"></div>
+              </div>
+              <div>
+                <div class="label">HELOC room today</div>
+                <div class="value" id="helocRoom"></div>
+              </div>
+              <div>
+                <div class="label">HELOC cap @ 65% LTV</div>
+                <div class="value" id="helocCap"></div>
+              </div>
+              <div>
+                <div class="label">Existing Mortgage</div>
+                <div class="value" id="existingMortgage"></div>
+              </div>
+            </div>
+            <p class="note">Assumes Canadian CLP: HELOC ≤ 65% LTV; combined mortgage+HELOC ≤ 80% LTV.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="calc container">
+      <div class="grid">
+        <div class="panel">
+          <h2>Inputs</h2>
+          <div class="fieldset">
+            <h3>Home &amp; HELOC</h3>
+            <div class="field"><label>Home value ($)</label><input id="homeValue" type="number" value="1200000" min="0" step="1000"></div>
+            <div class="field"><label>Current mortgage balance ($)</label><input id="mortgageBalance" type="number" value="330000" min="0" step="1000"></div>
+            <div class="field two">
+              <div><label>Primary mortgage rate (%)</label><input id="primaryRate" type="number" value="5.5" min="0" step="0.01"></div>
+              <div><label>Amortization (years)</label><input id="amortYears" type="number" value="25" min="1" step="1"></div>
+            </div>
+            <div class="field two">
+              <div><label>Extra monthly prepayment ($)</label><input id="extraPrepay" type="number" value="2000" min="0" step="100"></div>
+              <div><label>HELOC rate (%)</label><input id="helocRate" type="number" value="6.7" min="0" step="0.01"></div>
+            </div>
+            <div class="field two">
+              <div><label>Max CLTV (%)</label><input id="maxLtv" type="number" value="80" min="1" max="95" step="0.1"></div>
+              <div><label>Max HELOC LTV (%)</label><input id="maxHelocLtv" type="number" value="65" min="1" max="95" step="0.1"></div>
+            </div>
+            <div class="field two">
+              <div><label>Marginal tax rate (%)</label><input id="taxRate" type="number" value="40" min="0" max="100" step="0.1"></div>
+              <div class="switch"><label><input id="capitalizeInterest" type="checkbox" checked> Capitalize investment interest</label></div>
+            </div>
+          </div>
+
+          <div class="fieldset">
+            <h3>Portfolio</h3>
+            <div class="field three">
+              <div><label>Dividend yield (%)</label><input id="dividendYield" type="number" value="4.5" min="0" step="0.1"></div>
+              <div><label>Total return (incl. yield) (%)</label><input id="totalReturn" type="number" value="6.0" min="0" step="0.1"></div>
+              <div><label>Inflation (%)</label><input id="inflation" type="number" value="2.5" min="0" step="0.1"></div>
+            </div>
+          </div>
+
+          <div class="fieldset">
+            <h3>Rentals</h3>
+            <div class="field three">
+              <div><label>Rental rate (%)</label><input id="rentalRate" type="number" value="5.5" min="0" step="0.1"></div>
+              <div><label>Amortization (years)</label><input id="rentalAmortYears" type="number" value="30" min="1" step="1"></div>
+              <div><label>Rental LTV (%)</label><input id="rentalLtv" type="number" value="80" min="1" step="0.1"></div>
+            </div>
+            <div class="table-wrap">
+              <table id="propertiesTable">
+                <thead><tr>
+                  <th>Property</th>
+                  <th>Price ($)</th>
+                  <th>Cap rate (%)</th>
+                  <th>Purchase month</th>
+                  <th>Use HELOC for 20% DP</th>
+                  <th></th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="actions">
+              <button id="addProperty" class="btn btn-ghost">+ Add property</button>
+            </div>
+          </div>
+
+          <div class="fieldset">
+            <h3>Plan</h3>
+            <div class="field three">
+              <div><label>Horizon (years)</label><input id="horizonYears" type="number" value="10" min="1" step="1"></div>
+              <div><label>Stop working in year</label><input id="retirementYear" type="number" value="5" min="1" step="1"></div>
+              <div><label>Target salary replacement (today $)</label><input id="salaryTarget" type="number" value="150000" min="0" step="1000"></div>
+            </div>
+            <div class="actions">
+              <button id="runPlan" class="btn btn-primary">Run plan</button>
+              <button id="resetInputs" class="btn btn-ghost">Reset</button>
+            </div>
+          </div>
+
+          <p class="disclaimer">This tool is for education only and simplifies tax and financing rules. Always consult a CPA and mortgage professional before implementing leverage strategies.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Results</h2>
+          <div class="cards">
+            <div class="card">
+              <div class="card-title">Year‑5 Snapshot</div>
+              <div class="card-grid two">
+                <div><div class="label">Non‑deductible mortgage</div><div class="value" id="mortgage5">–</div></div>
+                <div><div class="label">Investment LOC balance</div><div class="value" id="loc5">–</div></div>
+                <div><div class="label">Dividends (annual)</div><div class="value" id="dividends5">–</div></div>
+                <div><div class="label">LOC interest (annual)</div><div class="value" id="interest5">–</div></div>
+                <div><div class="label">Tax savings (annual)</div><div class="value" id="taxSavings5">–</div></div>
+                <div><div class="label">Net invest income</div><div class="value" id="netIncome5">–</div></div>
+              </div>
+              <div class="target-row">
+                <span class="label">Target in Year‑5 dollars:</span>
+                <span class="value" id="target5">–</span>
+                <span class="badge" id="targetBadge">–</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Year‑10 Projection</div>
+              <div class="card-grid two">
+                <div><div class="label">Non‑deductible mortgage</div><div class="value" id="mortgage10">–</div></div>
+                <div><div class="label">Investment LOC balance</div><div class="value" id="loc10">–</div></div>
+                <div><div class="label">Dividends (annual)</div><div class="value" id="dividends10">–</div></div>
+                <div><div class="label">LOC interest (annual)</div><div class="value" id="interest10">–</div></div>
+                <div><div class="label">Tax savings (annual)</div><div class="value" id="taxSavings10">–</div></div>
+                <div><div class="label">Net invest income</div><div class="value" id="netIncome10">–</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts">
+            <div class="card">
+              <div class="card-title">Balances over time</div>
+              <canvas id="balancesChart" height="120"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title">Annual cashflows</div>
+              <canvas id="cashflowChart" height="120"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>© <span id="year"></span> FI Planner • Educational only</div>
+      <div class="footer-links">
+        <a id="downloadPlan" class="btn btn-ghost">Download plan JSON</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
